@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source name="MySQL - zhuzheng@localhost" uuid="42cbe4a9-49fa-404d-934c-bd4b2044a01d">
+    <database-info product="MySQL" version="5.7.17" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.40 ( Revision: 402933ef52cad9aa82624e80acbea46e3a701ce6 )">
+      <extra-name-characters>#@</extra-name-characters>
+      <identifier-quote-string>`</identifier-quote-string>
+    </database-info>
+    <case-sensitivity plain-identifiers="lower" quoted-identifiers="lower"/>
+    <schema name="" catalog="zhuzheng"/>
+    <table name="chinese_question" schema="" catalog="zhuzheng" type="TABLE">
+      <column name="q_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="question" sqlType="TEXT" precision="65535" scale="0" nullable="true" jdbcType="-1"/>
+      <primary-key name="PRIMARY" columns="q_id"/>
+    </table>
+    <table name="chinese_question_copy" schema="" catalog="zhuzheng" type="TABLE">
+      <column name="q_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="question" sqlType="TEXT" precision="65535" scale="0" nullable="true" jdbcType="-1"/>
+      <primary-key name="PRIMARY" columns="q_id"/>
+    </table>
+    <table name="ques_dist" schema="" catalog="zhuzheng" type="TABLE">
+      <column name="qd_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="q1_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="q2_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="distance" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="similarity" sqlType="DOUBLE" precision="22" scale="0" nullable="true" jdbcType="8"/>
+      <primary-key name="PRIMARY" columns="qd_id"/>
+    </table>
+    <table name="word" schema="" catalog="zhuzheng" type="TABLE">
+      <column name="w_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="wordname" sqlType="TEXT" precision="65535" scale="0" nullable="true" jdbcType="-1"/>
+      <column name="characteristic" sqlType="VARCHAR" precision="255" scale="0" nullable="true" jdbcType="12"/>
+      <column name="frequency" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="w_id"/>
+    </table>
+  </data-source>
+</component>
