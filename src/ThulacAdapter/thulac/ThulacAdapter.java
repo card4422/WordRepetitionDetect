@@ -73,6 +73,7 @@ public class ThulacAdapter {
 	    if(useFilter){
 	        filter = new Filter((prefix+"xu.dat"), (prefix+"time.dat"));
 	    }
+
 	    
 	    //读取模型结束，开始读取文本数据
 	    InputStream stream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));

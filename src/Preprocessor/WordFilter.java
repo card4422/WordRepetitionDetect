@@ -29,7 +29,8 @@ public class WordFilter
 			keyWord.put(mark[1], "_"+mark[0]);
 		}
 	}
-	
+
+
 	/**
 	 * 构造一个HashMap
 	 * 其中key存放的是词性，value存放的是词性对应的标记符
