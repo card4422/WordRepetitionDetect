@@ -21,12 +21,14 @@ public class LevenshteinDistanceCalculator
 		for(int i=0;i<=str2.length;i++){
 			matrix[i] = new int [str1.length+1];
 		}
+
 		//在矩阵的第一行写上0~s，s为str1的长度
 		for(int i=0;i<=str1.length;i++){
 			matrix[0][i]= i;
 		}
+
 		//在矩阵的第一列写上0~t，t为str2的长度
-		for(int j=0;j<=str2.length;j++){
+		for(int j=1;j<=str2.length;j++){
 			matrix[j][0]= j;
 		}
 
@@ -86,7 +88,7 @@ public class LevenshteinDistanceCalculator
         else{
             max = matrix[0].length;
         }
-        return LevenshteinDistance/max;
+        return 1-LevenshteinDistance/max;
     }
 
 	/**

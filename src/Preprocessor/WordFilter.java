@@ -56,17 +56,18 @@ public class WordFilter
 
 	public String doFilter(String str){
 		String temp;
+
 		Pattern p = Pattern.compile("&nbsp;");
 		Matcher m = p.matcher(str);
-		temp = m.replaceAll("");
+		temp = m.replaceAll("");// 过滤空格符&nbsp
 
 		p = Pattern.compile("_");
 		m = p.matcher(temp);
-		temp = m.replaceAll("");
+		temp = m.replaceAll("");// 过滤下划线
 
 		p = Pattern.compile("'");
 		m = p.matcher(temp);
-		temp = m.replaceAll("");
+		temp = m.replaceAll("");// 过滤单引号
 
 		p = Pattern.compile("<br/>");
 		m = p.matcher(temp);
@@ -96,6 +97,7 @@ public class WordFilter
 		m = p.matcher(temp);
 		temp = m.replaceAll(""); // 过滤span标签
 
+		temp = temp.replaceAll("\\s*", "");
 
 		return temp;
 	}
