@@ -51,40 +51,6 @@ public class main
 			db.closeConn();
 		}
 
-		//原始版
-		/*
-		if(db.createConn() && db2.createConn()) {
-			String sql = "select q_id,question from chinese_question_copy";
-			db.query(sql);
-			while(db.next()) {
-				String str1 = db.getValue("question");
-				String temp_sql = "select q_id,question from chinese_question_copy where q_id>" + db.getValue("q_id");
-				db2.query(temp_sql);
-				while (db2.next()) {
-					String str2 = db2.getValue("question");
-					Pattern p = Pattern.compile("&nbsp;");
-					String [] arr_str1 = thulac.run(p.matcher(str1).replaceAll(""));
-					String [] arr_str2 = thulac.run(p.matcher(str2).replaceAll(""));
-					//计算编辑距离，存入数据库中
-					LevenshteinDistanceCalculator calculator = new LevenshteinDistanceCalculator(arr_str1,arr_str2);
-					int disatance = calculator.getLevenshteinDistance();
-					double similarity = calculator.getSimilarity();
-					DistanceBean disb = new DistanceBean();
-					//disb.add(Integer.parseInt(db.getValue("q_id")),Integer.parseInt(db2.getValue("q_id")),disatance);
-					disb.add(Integer.parseInt(db.getValue("q_id")),Integer.parseInt(db2.getValue("q_id")),disatance,similarity);
-				}
-			}
-
-			db.closeRs();
-			db.closeStm();
-			db.closeConn();
-			db2.closeRs();
-			db2.closeStm();
-			db2.closeConn();
-
-			//过滤
-		}
-		*/
 		long startTime = System.currentTimeMillis();    //获取开始时间
 
 		//EDITED
@@ -92,31 +58,42 @@ public class main
 			String sql = "select q_id,question from chinese_question_copy";
 			db.query(sql);
 			int size = 0;
-			String[] arr_str = new String[10000];
-			int[] arr_int = new int[10000];
+			String[][] arr_str = new String[100000][];
+			int[] arr_int = new int[100000];
 
 			//initialization
-			while (db.next() && size < 10000) {
-				arr_str[size] = db.getValue("question");
+			long start = System.currentTimeMillis();    //获取结束时间
+
+			while (db.next() && size < 100000) {
+				arr_str[size] = thulac.run(db.getValue("question"));
 				arr_int[size] = db.getIntValue("q_id");
 				size++;
+				System.out.println(size);
 			}
 
+			long end = System.currentTimeMillis();    //获取结束时间
+			System.out.println("分词所用时间：" + (end - start) + "ms");    //分词所用时间
 
 			int count1 = 0;
 			while (count1 < size) {
 				int count2 = count1 + 1;
 				while (count2 < size) {
-
-					String[] arr_str1 = thulac.run(arr_str[count1]);
-					String[] arr_str2 = thulac.run(arr_str[count2]);
+					//String[] arr_str1 = arr_str[count1];
+					//String[] arr_str2 = arr_str[count2];
 
 					//计算编辑距离，存入数据库中
-					LevenshteinDistanceCalculator calculator = new LevenshteinDistanceCalculator(arr_str1, arr_str2);
+					 start = System.currentTimeMillis();    //获取结束时间
+					LevenshteinDistanceCalculator calculator = new LevenshteinDistanceCalculator(arr_str[count1], arr_str[count2]);
 					int disatance = calculator.getLevenshteinDistance();
 					double similarity = calculator.getSimilarity();
+					end = System.currentTimeMillis();    //获取结束时间
+					System.out.println("计算编辑距离和相似度时间：" + (end - start) + "ms");    //计算编辑距离和相似度时间
+
+					start = System.currentTimeMillis();    //获取结束时间
 					DistanceBean disb = new DistanceBean();
 					disb.add(arr_int[count1], arr_int[count2], disatance, similarity);
+					end = System.currentTimeMillis();    //获取结束时间
+					System.out.println("将数据插入数据库时间：" + (end - start) + "ms");    //将数据插入数据库时间
 
 					count2++;
 				}
@@ -128,10 +105,9 @@ public class main
 		db.closeStm();
 		db.closeConn();
 
-
 		long endTime = System.currentTimeMillis();    //获取结束时间
 
-		System.out.println("程序运行时间：" + (endTime - startTime)/1000/60/60 + "h");    //输出程序运行时间
+		System.out.println("程序运行时间：" + (endTime - startTime)/1000/60 + "min");    //输出程序运行时间
 
 	}
 

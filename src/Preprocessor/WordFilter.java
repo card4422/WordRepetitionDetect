@@ -73,7 +73,7 @@ public class WordFilter
 		p = Pattern.compile("<br/>");
 		m = p.matcher(temp);
 		temp = m.replaceAll("");
-
+		/*
 		p = Pattern.compile("<script[^>]*?>[\\s\\S]*?<\\/script>", Pattern.CASE_INSENSITIVE);
 		m = p.matcher(temp);
 		temp = m.replaceAll(""); // 过滤script标签
@@ -97,7 +97,7 @@ public class WordFilter
 		p = Pattern.compile("<span[^>]*?>[\\s\\S]*?<\\/span>", Pattern.CASE_INSENSITIVE);
 		m = p.matcher(temp);
 		temp = m.replaceAll(""); // 过滤span标签
-
+*/
 		temp = temp.replaceAll("\\s*", "");
 
 		return temp;
