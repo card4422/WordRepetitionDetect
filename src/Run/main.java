@@ -1,5 +1,6 @@
 package Run;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,49 +14,51 @@ import DBAccess.QuestionBean;
 
 public class main
 {
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException {
 		//从数据库中读取字符串
-		DBAccess db1 = new DBAccess();
-		DBAccess db2 = new DBAccess();
+		DBAccess db = new DBAccess();
 		ThulacAdapter thulac = new ThulacAdapter();
 
 		//将所有question表中题目进行分词并且将词存入word表中
 		/*
-		if(db1.createConn()) {
+		if(db.createConn()) {
 			String sql = "select question from chinese_question";
-			db1.query(sql);
-			while (db1.next()) {
-				StoreWord(thulac.run(db1.getValue("question")));
+			db.query(sql);
+			while (db.next()) {
+				StoreWord(thulac.run(db.getValue("question")));
 			}
-			db1.closeRs();
-			db1.closeStm();
-			db1.closeConn();
+			db.closeRs();
+			db.closeStm();
+			db.closeConn();
 		}
 */
-		if(db1.createConn()) {
+
+
+		//将原始数据进行第一次过滤
+		if (db.createConn()) {
 			String sql = "select q_id,question from chinese_question";
-			db1.query(sql);
-			while(db1.next()) {
-				int q_id = Integer.parseInt(db1.getValue("q_id"));
-				String question = db1.getValue("question");
+			db.query(sql);
+			while (db.next()) {
+				int q_id = Integer.parseInt(db.getValue("q_id"));
+				String question = db.getValue("question");
 				WordFilter wf = new WordFilter();
 				question = wf.doFilter(question);
 				QuestionBean qb = new QuestionBean();
-				qb.add(q_id,question);
+				qb.add(q_id, question);
 			}
-			db1.closeRs();
-			db1.closeStm();
-			db1.closeConn();
+			db.closeRs();
+			db.closeStm();
+			db.closeConn();
 		}
 
-		System.out.println();
-
-		if(db1.createConn() && db2.createConn()) {
+		//原始版
+		/*
+		if(db.createConn() && db2.createConn()) {
 			String sql = "select q_id,question from chinese_question_copy";
-			db1.query(sql);
-			while(db1.next()) {
-				String str1 = db1.getValue("question");
-				String temp_sql = "select q_id,question from chinese_question_copy where q_id>" + db1.getValue("q_id");
+			db.query(sql);
+			while(db.next()) {
+				String str1 = db.getValue("question");
+				String temp_sql = "select q_id,question from chinese_question_copy where q_id>" + db.getValue("q_id");
 				db2.query(temp_sql);
 				while (db2.next()) {
 					String str2 = db2.getValue("question");
@@ -67,20 +70,68 @@ public class main
 					int disatance = calculator.getLevenshteinDistance();
 					double similarity = calculator.getSimilarity();
 					DistanceBean disb = new DistanceBean();
-					//disb.add(Integer.parseInt(db1.getValue("q_id")),Integer.parseInt(db2.getValue("q_id")),disatance);
-					disb.add(Integer.parseInt(db1.getValue("q_id")),Integer.parseInt(db2.getValue("q_id")),disatance,similarity);
+					//disb.add(Integer.parseInt(db.getValue("q_id")),Integer.parseInt(db2.getValue("q_id")),disatance);
+					disb.add(Integer.parseInt(db.getValue("q_id")),Integer.parseInt(db2.getValue("q_id")),disatance,similarity);
 				}
 			}
 
-			db1.closeRs();
-			db1.closeStm();
-			db1.closeConn();
+			db.closeRs();
+			db.closeStm();
+			db.closeConn();
 			db2.closeRs();
 			db2.closeStm();
 			db2.closeConn();
 
 			//过滤
 		}
+		*/
+		long startTime = System.currentTimeMillis();    //获取开始时间
+
+		//EDITED
+		if (db.createConn()) {
+			String sql = "select q_id,question from chinese_question_copy";
+			db.query(sql);
+			int size = 0;
+			String[] arr_str = new String[10000];
+			int[] arr_int = new int[10000];
+
+			//initialization
+			while (db.next() && size < 10000) {
+				arr_str[size] = db.getValue("question");
+				arr_int[size] = db.getIntValue("q_id");
+				size++;
+			}
+
+			int count1 = 0;
+			while (count1 < size) {
+				int count2 = count1 + 1;
+				while (count2 < size) {
+
+					String[] arr_str1 = thulac.run(arr_str[count1]);
+					String[] arr_str2 = thulac.run(arr_str[count2]);
+
+					//计算编辑距离，存入数据库中
+					LevenshteinDistanceCalculator calculator = new LevenshteinDistanceCalculator(arr_str1, arr_str2);
+					int disatance = calculator.getLevenshteinDistance();
+					double similarity = calculator.getSimilarity();
+					DistanceBean disb = new DistanceBean();
+					disb.add(arr_int[count1], arr_int[count2], disatance, similarity);
+
+					count2++;
+				}
+				//过滤
+				count1 ++;
+			}
+		}
+		db.closeRs();
+		db.closeStm();
+		db.closeConn();
+
+
+		long endTime = System.currentTimeMillis();    //获取结束时间
+
+		System.out.println("程序运行时间：" + (endTime - startTime)/1000/60/60 + "h");    //输出程序运行时间
+
 	}
 
 	private static void StoreWord(String [] wordlist){

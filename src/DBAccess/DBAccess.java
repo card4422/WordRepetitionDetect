@@ -12,11 +12,6 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 
 public class DBAccess {
-    /*
-	private String drv = "com.mysql.jdbc.Driver";
-	private String url = "jdbc:mysql://localhost:3306/zhuzheng?useUnicode=true&characterEncoding=utf-8&useSSL=false";
-	private String usr = "root";
-	private String pwd = "123456";*/
 	private Connection conn = null;
 	private Statement stm = null;
 	private ResultSet rs = null;
@@ -90,6 +85,17 @@ public class DBAccess {
 		}catch(Exception e){
             e.printStackTrace();
         }
+		return value;
+	}
+
+	public int getIntValue(String field){
+		int value = -1;
+		try{
+			if(rs!=null)
+				value = rs.getInt(field);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		return value;
 	}
 
