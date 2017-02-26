@@ -27,6 +27,7 @@ public class DBAccess {
 			throw new ExceptionInInitializerError("初始化连接错误，请检查配置文件！");
 		}
 	}
+
 	//从池中获取一个连接
 	public static Connection getConnection() throws SQLException{
 		return ds.getConnection();

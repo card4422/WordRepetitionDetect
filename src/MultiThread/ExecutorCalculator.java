@@ -66,6 +66,7 @@ public class ExecutorCalculator {
         return getResult();
     }
 
+
     /**
      * 迭代每个子任务，获得部分和，相加返回
      *

@@ -102,6 +102,7 @@ public class main
 				size++;
 			}
 
+
 			int count1 = 0;
 			while (count1 < size) {
 				int count2 = count1 + 1;
