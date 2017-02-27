@@ -82,19 +82,12 @@ public class main
 					//String[] arr_str2 = arr_str[count2];
 
 					//计算编辑距离，存入数据库中
-					 start = System.currentTimeMillis();    //获取结束时间
 					LevenshteinDistanceCalculator calculator = new LevenshteinDistanceCalculator(arr_str[count1], arr_str[count2]);
 					int disatance = calculator.getLevenshteinDistance();
 					double similarity = calculator.getSimilarity();
-					end = System.currentTimeMillis();    //获取结束时间
-					System.out.println("计算编辑距离和相似度时间：" + (end - start) + "ms");    //计算编辑距离和相似度时间
 
-					start = System.currentTimeMillis();    //获取结束时间
 					DistanceBean disb = new DistanceBean();
 					disb.add(arr_int[count1], arr_int[count2], disatance, similarity);
-					end = System.currentTimeMillis();    //获取结束时间
-					System.out.println("将数据插入数据库时间：" + (end - start) + "ms");    //将数据插入数据库时间
-
 					count2++;
 				}
 				//过滤
