@@ -15,7 +15,8 @@ public class WordFilter
 	" k/后接成分 i/习语 j/简称 r/代词 c/连词 p/介词"+
 	" u/助词 y/语气助词 e/叹词 o/拟声词 g/语素 w/标点 x/其它";
 	private String [] input_str = null;
-	
+
+
 	/**
 	 * 构造一个HashMap
 	 * 其中key存放的是词性，value存放的是词性对应的标记符

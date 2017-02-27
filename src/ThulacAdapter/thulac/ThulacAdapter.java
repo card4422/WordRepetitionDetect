@@ -35,6 +35,7 @@ public class ThulacAdapter {
 	    boolean useFilter = false;
 	    int maxLength = 50000;
 
+
 	    //载入模型
 	    String prefix;
 	    prefix = "E:/workspace/WordRepetitionDetect-master/lib/models/";

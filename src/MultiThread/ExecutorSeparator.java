@@ -28,6 +28,7 @@ public class ExecutorSeparator {
         private int start;
         private int end;
 
+
         public SumCalculator(final String[] arr_string, int start, int end) {
             this.arr_string = arr_string;
             this.start = start;
