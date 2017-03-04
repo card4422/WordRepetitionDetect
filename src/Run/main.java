@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import DBAccess.DBAccess;
 import LevenshteinDistance.LevenshteinDistanceCalculator;
+import MultiThread.ExecutorSeparator;
 import Preprocessor.WordFilter;
 import ThulacAdapter.thulac.ThulacAdapter;
 import DBAccess.WordBean;
@@ -35,7 +36,7 @@ public class main
 
 
 		//将原始数据进行第一次过滤
-		if (db.createConn()) {
+/*		if (db.createConn()) {
 			String sql = "select q_id,question from chinese_question";
 			db.query(sql);
 			while (db.next()) {
@@ -50,7 +51,7 @@ public class main
 			db.closeStm();
 			db.closeConn();
 		}
-
+*/
 		long startTime = System.currentTimeMillis();    //获取开始时间
 
 		//EDITED
@@ -58,18 +59,29 @@ public class main
 			String sql = "select q_id,question from chinese_question_copy";
 			db.query(sql);
 			int size = 0;
-			String[][] arr_str = new String[100000][];
-			int[] arr_int = new int[100000];
+			String[][] arr_str = new String[10000][];
+			int[] arr_int = new int[10000];
 
 			//initialization
 			long start = System.currentTimeMillis();    //获取结束时间
 
-			while (db.next() && size < 100000) {
-				arr_str[size] = thulac.run(db.getValue("question"));
+//			while (db.next() && size < 100000) {
+//				arr_str[size] = thulac.run(db.getValue("question"));
+//				arr_int[size] = db.getIntValue("q_id");
+//				size++;
+//				System.out.println(size);
+//			}
+
+
+			String [] temp_arr_str = new String[10000];
+			while (db.next() && size < 10000) {
+				temp_arr_str[size] = db.getValue("question");
 				arr_int[size] = db.getIntValue("q_id");
 				size++;
-				System.out.println(size);
 			}
+
+			ExecutorSeparator es = new ExecutorSeparator();
+			arr_str = es.separate(temp_arr_str);
 
 			long end = System.currentTimeMillis();    //获取结束时间
 			System.out.println("分词所用时间：" + (end - start) + "ms");    //分词所用时间

@@ -38,8 +38,8 @@ public class ThulacAdapter {
 
 	    //载入模型
 	    String prefix;
-	    prefix = "E:/workspace/WordRepetitionDetect-master/lib/models/";
-    	//prefix = "/Users/zhuzheng/workspace/WordRepetitionDetect/lib/models/";
+	    //prefix = "E:/workspace/WordRepetitionDetect-master/lib/models/";
+    	prefix = "/Users/zhuzheng/workspace/WordRepetitionDetect/lib/models/";
 	    String oiraw;
 	    String raw =new String();
 	    POCGraph poc_cands = new POCGraph();

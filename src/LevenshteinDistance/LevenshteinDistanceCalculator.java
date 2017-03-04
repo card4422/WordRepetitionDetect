@@ -99,6 +99,7 @@ public class LevenshteinDistanceCalculator
 	 * @return 三个value中的最小值
 	 */
 
+
 	private int min(int n1,int n2,int n3){
 		int temp;
 		if(n1>n2){
