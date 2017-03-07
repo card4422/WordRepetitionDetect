@@ -16,7 +16,6 @@ public class WordFilter
 	" u/助词 y/语气助词 e/叹词 o/拟声词 g/语素 w/标点 x/其它";
 	private String [] input_str = null;
 
-
 	/**
 	 * 构造一个HashMap
 	 * 其中key存放的是词性，value存放的是词性对应的标记符
@@ -30,7 +29,6 @@ public class WordFilter
 			keyWord.put(mark[1], "_"+mark[0]);
 		}
 	}
-
 
 	/**
 	 * 构造一个HashMap

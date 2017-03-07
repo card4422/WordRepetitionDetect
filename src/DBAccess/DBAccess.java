@@ -16,7 +16,6 @@ public class DBAccess {
 	private Statement stm = null;
 	private ResultSet rs = null;
 
-
 	private static DataSource ds;//定义一个连接池对象
 	static{
 		try {
@@ -76,8 +75,7 @@ public class DBAccess {
         }
 		return b;
 	}
-	
-	
+
 	public String getValue(String field){
 		String value = null;
 		try{

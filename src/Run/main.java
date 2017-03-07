@@ -12,6 +12,7 @@ import ThulacAdapter.thulac.ThulacAdapter;
 import DBAccess.WordBean;
 import DBAccess.DistanceBean;
 import DBAccess.QuestionBean;
+import DBAccess.ParticipleBean;
 
 public class main
 {
@@ -19,80 +20,84 @@ public class main
 		//从数据库中读取字符串
 		DBAccess db = new DBAccess();
 		ThulacAdapter thulac = new ThulacAdapter();
-
+		DBAccess attr_db = new DBAccess();
 		//将所有question表中题目进行分词并且将词存入word表中
-		/*
-		if(db.createConn()) {
-			String sql = "select question from chinese_question";
-			db.query(sql);
-			while (db.next()) {
-				StoreWord(thulac.run(db.getValue("question")));
-			}
-			db.closeRs();
-			db.closeStm();
-			db.closeConn();
-		}
-*/
 
+//		if(db.createConn()) {
+//			String sql = "select question from chinese_question";
+//			db.query(sql);
+//			while (db.next()) {
+//				StoreWord(thulac.run(db.getValue("question")));
+//			}
+//			db.closeRs();
+//			db.closeStm();
+//			db.closeConn();
+//		}
 
-		//将原始数据进行第一次过滤
-/*		if (db.createConn()) {
+		//过滤特殊符号+分词，存入数据库
+		if (db.createConn() && attr_db.createConn()) {
+
 			String sql = "select q_id,question from chinese_question";
 			db.query(sql);
 			while (db.next()) {
+				//将原始数据进行第一次过滤,去除无关符号以及标签
 				int q_id = Integer.parseInt(db.getValue("q_id"));
 				String question = db.getValue("question");
 				WordFilter wf = new WordFilter();
 				question = wf.doFilter(question);
-				QuestionBean qb = new QuestionBean();
-				qb.add(q_id, question);
+
+				//预处理：分词过程
+				String [] temp = thulac.run(question);
+
+					//过滤某些不需要的词性的词
+					//同义词替换
+				String str = "";
+				for(int i=0;i<temp.length;i++){
+					str += temp[i] +" ";
+				}
+				ParticipleBean pb = new ParticipleBean();
+				pb.add(attr_db,q_id,str,temp.length);
 			}
 			db.closeRs();
 			db.closeStm();
 			db.closeConn();
+			attr_db.closeRs();
+			attr_db.closeStm();
+			attr_db.closeConn();
 		}
-*/
-		long startTime = System.currentTimeMillis();    //获取开始时间
 
-		//EDITED
+		//计算编辑距离并且存入数据库
 		if (db.createConn()) {
+			//将数据库中的数据取出存放入数组（内存）中
 			String sql = "select q_id,question from chinese_question_copy";
 			db.query(sql);
 			int size = 0;
+			//arr_str存放数据库中取出的题目，有序
 			String[][] arr_str = new String[10000][];
+			//arr_int存放数据库中取出的题目id，有序
 			int[] arr_int = new int[10000];
 
-			//initialization
-			long start = System.currentTimeMillis();    //获取结束时间
+			//初始化数组的值
+			//该数组暂时存放从数据库中取出的字符串题目
+			String[] temp_arr_str = new String[10000];
 
-//			while (db.next() && size < 100000) {
-//				arr_str[size] = thulac.run(db.getValue("question"));
-//				arr_int[size] = db.getIntValue("q_id");
-//				size++;
-//				System.out.println(size);
-//			}
-
-
-			String [] temp_arr_str = new String[10000];
 			while (db.next() && size < 10000) {
 				temp_arr_str[size] = db.getValue("question");
 				arr_int[size] = db.getIntValue("q_id");
 				size++;
 			}
 
-			ExecutorSeparator es = new ExecutorSeparator();
-			arr_str = es.separate(temp_arr_str);
+			//将数据库中的题目以空格进行分割，存入数组arr_str中
+			for(int i=0;i<temp_arr_str.length;i++){
+				arr_str[i] = temp_arr_str[i].split(" ");
+			}
 
-			long end = System.currentTimeMillis();    //获取结束时间
-			System.out.println("分词所用时间：" + (end - start) + "ms");    //分词所用时间
-
+//			ExecutorSeparator es = new ExecutorSeparator();
+//			arr_str = es.separate(temp_arr_str);
 			int count1 = 0;
 			while (count1 < size) {
 				int count2 = count1 + 1;
 				while (count2 < size) {
-					//String[] arr_str1 = arr_str[count1];
-					//String[] arr_str2 = arr_str[count2];
-
 					//计算编辑距离，存入数据库中
 					LevenshteinDistanceCalculator calculator = new LevenshteinDistanceCalculator(arr_str[count1], arr_str[count2]);
 					int disatance = calculator.getLevenshteinDistance();
@@ -102,18 +107,12 @@ public class main
 					disb.add(arr_int[count1], arr_int[count2], disatance, similarity);
 					count2++;
 				}
-				//过滤
-				count1 ++;
+				count1++;
 			}
+			db.closeRs();
+			db.closeStm();
+			db.closeConn();
 		}
-		db.closeRs();
-		db.closeStm();
-		db.closeConn();
-
-		long endTime = System.currentTimeMillis();    //获取结束时间
-
-		System.out.println("程序运行时间：" + (endTime - startTime)/1000/60 + "min");    //输出程序运行时间
-
 	}
 
 	private static void StoreWord(String [] wordlist){

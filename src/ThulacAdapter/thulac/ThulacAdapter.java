@@ -38,8 +38,8 @@ public class ThulacAdapter {
 
 	    //载入模型
 	    String prefix;
-	    //prefix = "E:/workspace/WordRepetitionDetect-master/lib/models/";
-    	prefix = "/Users/zhuzheng/workspace/WordRepetitionDetect/lib/models/";
+	    prefix = "E:/workspace/WordRepetitionDetect-master/lib/models/";
+    	//prefix = "/Users/zhuzheng/workspace/WordRepetitionDetect/lib/models/";
 	    String oiraw;
 	    String raw =new String();
 	    POCGraph poc_cands = new POCGraph();
@@ -75,11 +75,10 @@ public class ThulacAdapter {
 	        filter = new Filter((prefix+"xu.dat"), (prefix+"time.dat"));
 	    }
 
-	    
 	    //读取模型结束，开始读取文本数据
 	    InputStream stream = new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
 	    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-		//计时器      
+		//计时器
         //long startTime = System.currentTimeMillis();//获取当前时间
         Vector<String> vec = null;
         
