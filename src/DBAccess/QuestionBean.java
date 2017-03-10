@@ -6,7 +6,7 @@ package DBAccess;
 public class QuestionBean {
     //Create
     public void add(DBAccess db, int q_id, String question) {
-        String sql = "insert into chinese_question_copy(q_id,question) values("
+        String sql = "insert into question(q_id,question) values("
                 + q_id + ",'" + question + "')";
         db.update(sql);
     }

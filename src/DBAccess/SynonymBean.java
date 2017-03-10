@@ -29,39 +29,12 @@ public class SynonymBean {
         return isExist;
     }
 
-
-    public int getFrequency(String wordname,String characteristic){
-        DBAccess db = new DBAccess();
-        String result = new String();
-        if(db.createConn()){
-            String sql = "select * from synonym where wordname='"
-                    + wordname + "' and characteristic='" + characteristic + "'";
-            db.query(sql);
-            if(db.next()) {
-                result = db.getValue("frequency");
-                if(result.equals(""))
-                    System.out.println(1234);
-            }
-            db.closeRs();
-            db.closeStm();
-            db.closeConn();
-        }
-        if(result.equals(""))
-            System.out.println(1234);
-        return Integer.parseInt(result);
-    }
-
     //Create
-    public void add(String code,String name){
-        DBAccess db = new DBAccess();
-        if(db.createConn()){
-            String sql = "insert into synonym(code,name) values('"
-                    + code + "','" + name + "')";
-            db.update(sql);
-            db.closeStm();
-            db.closeConn();
-        }
+    public void add(DBAccess db,String code,String name) {
+        String sql = "insert into synonym(key_word,similar_word) values('"
+                + code + "','" + name + "')";
+        db.update(sql);
+        db.closeStm();
+        db.closeConn();
     }
-
-
 }

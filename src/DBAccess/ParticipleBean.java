@@ -16,7 +16,7 @@ public class ParticipleBean {
      * @param number
      */
     public void add(DBAccess db, int q_id, String question, int number) {
-        String sql = "insert into chinese_question_after(q_id,question,number) values("
+        String sql = "insert into question_after(q_id,content_after,number) values("
                 + q_id + ",'" + question + "'," + number + ")";
         db.update(sql);
     }
