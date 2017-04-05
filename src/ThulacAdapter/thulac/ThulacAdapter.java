@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 import java.util.regex.*;
 
+import Preprocessor.Word;
 import ThulacAdapter.manage.Filter;
 import ThulacAdapter.manage.NegWord;
 import ThulacAdapter.manage.Postprocesser;
@@ -26,7 +27,7 @@ public class ThulacAdapter {
 	 * @throws IOException 
 	 */
 	
-	public String[] run(String str) throws IOException {		
+	public Word[] run(String str) throws IOException {
 	    Character separator = '_';
 
 	    //基础参数的设置
@@ -112,10 +113,10 @@ public class ThulacAdapter {
 			    		if(useFilter){
 		                    filter.adjust(segged);
 		                }
-			    		String [] split_words = new String[segged.size()];
-			    		split_words [i] = segged.get(i);
+			    		Word [] split_words = new Word[segged.size()];
+			    		split_words [i].wordName = segged.get(i);
 		    			for(int j=1;j<segged.size();j++) 
-		    				split_words [j] = segged.get(j);
+		    				split_words [j].wordName = segged.get(j);
 		    			return split_words;
 		    		}
 		    		else {
@@ -132,9 +133,11 @@ public class ThulacAdapter {
 		    				filter.adjust(tagged);
 		    			}		    			
 
-		    	        String [] split_words = new String[tagged.size()];
+		    	        Word [] split_words = new Word[tagged.size()];
 		    			for(int j=0;j<tagged.size();j++) {
-		    				split_words[j] = tagged.get(j).word+tagged.get(j).separator+tagged.get(j).tag;
+//		    				split_words[j] = tagged.get(j).word+tagged.get(j).separator+tagged.get(j).tag;
+                            Word w = new Word();
+                            split_words[j]=new Word(tagged.get(j).word,tagged.get(j).tag);
 		    			}
 		    			return split_words;
 		    		}

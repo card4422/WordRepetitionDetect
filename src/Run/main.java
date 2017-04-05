@@ -6,65 +6,94 @@ import java.util.regex.Pattern;
 
 import DBAccess.DBAccess;
 import LevenshteinDistance.LevenshteinDistanceCalculator;
-import MultiThread.ExecutorSeparator;
+import Preprocessor.SynonymUnify;
+import Preprocessor.Word;
 import Preprocessor.WordFilter;
 import ThulacAdapter.thulac.ThulacAdapter;
 import DBAccess.WordBean;
 import DBAccess.DistanceBean;
 import DBAccess.QuestionBean;
 import DBAccess.ParticipleBean;
+import DBAccess.SynonymBean;
+public class main {
+    public static void main(String[] args) throws IOException {
+        //从txt中读取同义词数据，输入到数据库中
+//        SynonymReader sr = new SynonymReader();
+//        sr.ReadData("C:\\Users\\Jimmy\\Desktop\\同义词.txt");
 
-public class main
-{
-	public static void main(String[] args) throws IOException {
-		//从数据库中读取字符串
-		DBAccess db = new DBAccess();
-		ThulacAdapter thulac = new ThulacAdapter();
-		DBAccess attr_db = new DBAccess();
-		//将所有question表中题目进行分词并且将词存入word表中
+        //从数据库中读取字符串
+        DBAccess db = new DBAccess();
+        ThulacAdapter thulac = new ThulacAdapter();
+        DBAccess attr_db = new DBAccess();
+        //将所有question表中题目进行分词并且将词存入word表中
 
-//		if(db.createConn()) {
-//			String sql = "select question from chinese_question";
-//			db.query(sql);
-//			while (db.next()) {
-//				StoreWord(thulac.run(db.getValue("question")));
-//			}
-//			db.closeRs();
-//			db.closeStm();
-//			db.closeConn();
-//		}
+        //过滤特殊符号+分词，存入数据库
+        if (db.createConn() && attr_db.createConn()) {
+            long startMili = System.currentTimeMillis();// 当前时间对应的毫秒数
+            long endMili = System.currentTimeMillis();
+            long participleTime = 0;
+            long filterTime = 0;
+            String sql = "select q_id,content from question";
+            db.query(sql);
+            while (db.next()) {
+                //将原始数据进行第一次过滤,去除无关符号以及标签
+                startMili = System.currentTimeMillis();
 
-		//过滤特殊符号+分词，存入数据库
-		if (db.createConn() && attr_db.createConn()) {
+                int q_id = Integer.parseInt(db.getValue("q_id"));
+                String question = db.getValue("content");
+                WordFilter wf = new WordFilter();
+                question = wf.doFilter(question);
 
-			String sql = "select q_id,content from question";
-			db.query(sql);
-			while (db.next()) {
-				//将原始数据进行第一次过滤,去除无关符号以及标签
-				int q_id = Integer.parseInt(db.getValue("q_id"));
-				String question = db.getValue("content");
-				WordFilter wf = new WordFilter();
-				question = wf.doFilter(question);
+                endMili = System.currentTimeMillis();
+                filterTime += endMili - startMili;
 
-				//预处理：分词过程
-				String [] temp = thulac.run(question);
+                startMili = System.currentTimeMillis();
 
-					//过滤某些不需要的词性的词
-					//同义词替换
-				String str = "";
-				for(int i=0;i<temp.length;i++){
-					str += temp[i] +" ";
-				}
-				ParticipleBean pb = new ParticipleBean();
-				pb.add(attr_db,q_id,str,temp.length);
-			}
-			db.closeRs();
-			db.closeStm();
-			db.closeConn();
-			attr_db.closeRs();
-			attr_db.closeStm();
-			attr_db.closeConn();
-		}
+                //预处理：分词过程
+                Word[] temp = thulac.run(question);
+
+                endMili = System.currentTimeMillis();
+                participleTime += endMili - startMili;
+
+                //将word存入word表中
+                StoreWord(temp);
+
+                startMili = System.currentTimeMillis();
+                //过滤某些不需要的词性的词
+                String []tmp = wf.CharacteristicFilter(temp);
+
+                //同义词替换
+                SynonymBean sb = new SynonymBean();
+                for (int i = 0; i < tmp.length; i++) {
+                    if (sb.isExist(tmp[i])) {
+                        tmp[i] = sb.getString(tmp[i]);
+                    }
+                }
+
+                endMili = System.currentTimeMillis();
+                filterTime += endMili - startMili;
+
+
+                String str = "";
+                for (int i = 0; i < tmp.length; i++) {
+                    if(tmp[i]!=null)
+                       str += tmp[i] + " ";
+                }
+                ParticipleBean pb = new ParticipleBean();
+                pb.add(attr_db, q_id, str, tmp.length);
+            }
+            db.closeRs();
+            db.closeStm();
+            db.closeConn();
+            attr_db.closeRs();
+            attr_db.closeStm();
+            attr_db.closeConn();
+
+            endMili = System.currentTimeMillis();
+            System.out.println("分词耗时为：" + participleTime / 1000 + "秒");
+            System.out.println("过滤耗时为：" + filterTime / 1000 + "秒");
+
+        }
 
 		long startMili=System.currentTimeMillis();// 当前时间对应的毫秒数
 
@@ -110,7 +139,7 @@ public class main
 					} else {
 						diff = (double) Math.abs(arr_num[count1] - arr_num[count2]) / arr_num[count2];
 					}
-					if (arr_num[count1] <= 10 && arr_num[count2] < 10 || diff < 0.3) {
+					if (arr_num[count1] <= 10 && arr_num[count2] < 10 || diff <= 0.3) {
 						//计算编辑距离，存入数据库中
 						LevenshteinDistanceCalculator calculator = new LevenshteinDistanceCalculator(arr_str[count1], arr_str[count2]);
 						int disatance = calculator.getLevenshteinDistance();
@@ -131,22 +160,16 @@ public class main
 		System.out.println("总耗时为："+(endMili-startMili)/1000+"秒");
 	}
 
-	private static void StoreWord(String [] wordlist){
+	private static void StoreWord(Word [] wordlist){
 		WordBean wb = new WordBean();
 		int frequency;
-		String wordname;
-		String characteristic;
-		int occurance;
 		for(int i=0;i<wordlist.length;i++){
-			occurance = wordlist[i].lastIndexOf("_");
-			wordname = wordlist[i].substring(0, occurance);
-			characteristic = wordlist[i].substring(occurance+1);
-			if(wb.isExist(wordname,characteristic)){
-				frequency = wb.getFrequency(wordname, characteristic);
-				wb.updateFreq(wordname, characteristic, frequency+1);
+			if(wb.isExist(wordlist[i].wordName,wordlist[i].characteristic)){
+				frequency = wb.getFrequency(wordlist[i].wordName, wordlist[i].characteristic);
+				wb.updateFreq(wordlist[i].wordName, wordlist[i].characteristic, frequency+1);
 			}else{
-				wb.add(wordname, characteristic);
+				wb.add(wordlist[i].wordName, wordlist[i].characteristic);
 			}
 		}
-	}
+    }
 }

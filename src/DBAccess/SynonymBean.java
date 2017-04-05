@@ -29,6 +29,24 @@ public class SynonymBean {
         return isExist;
     }
 
+    public String getString(String word){
+        String result = new String();
+        DBAccess db = new DBAccess();
+        if(db.createConn()){
+            String sql = "select * from synonym where similar_word='"
+                    + word + "'";
+            db.query(sql);
+            if(db.next())
+              result = db.getValue("key_word");
+
+            db.closeRs();
+            db.closeStm();
+            db.closeConn();
+        }
+        return result;
+    }
+
+
     //Create
     public void add(DBAccess db,String code,String name) {
         String sql = "insert into synonym(key_word,similar_word) values('"

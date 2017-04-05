@@ -1,6 +1,4 @@
 package DBAccess;
-import java.sql.*;
-import java.util.Vector;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -124,5 +122,4 @@ public class DBAccess {
             e.printStackTrace();
         }
 	}
-	
 }
